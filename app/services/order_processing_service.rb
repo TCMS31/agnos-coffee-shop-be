@@ -12,6 +12,9 @@ class OrderProcessingService
 
   def process_order
     ActiveRecord::Base.transaction do
+      if order_items_data.blank?
+        raise ActiveRecord::RecordInvalid.new, { errors: { message: 'Order items are required!' } }
+      end
       customer = Customer.find_or_create_by(@customer_data)
       order = customer.orders.create!
       order_items = order.order_items.create!(@order_items_data)
@@ -21,7 +24,7 @@ class OrderProcessingService
       end
     end
   rescue ActiveRecord::RecordInvalid => e
-    { status: 'error', message: e.record.errors.full_messages.to_sentence }
+    { status: 'error', message: e.record&.errors&.full_messages&.to_sentence || e.message }
   end
 
   def calculate_total_price(order_items)

@@ -13,7 +13,6 @@ module Api
       end
 
       def create
-        byebug
         if new_resource.save
           render json: new_resource, status: :created
         else
