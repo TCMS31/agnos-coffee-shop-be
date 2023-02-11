@@ -1,0 +1,29 @@
+# PostgreSQL connection settings.
+#
+# Every value is environment-driven so the same file works for local development,
+# CI and containers. `DATABASE_URL`, when set, still takes precedence over
+# everything below (Rails merges it in automatically).
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see the Rails configuration guide:
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
+  port: <%= ENV.fetch("DATABASE_PORT", 5432) %>
+  username: <%= ENV.fetch("DATABASE_USERNAME", nil) %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", nil) %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("DATABASE_NAME", "coffee_shop_development") %>
+
+# Warning: the database defined as "test" is erased and re-generated between
+# test runs. Never point it at the development or production database.
+test:
+  <<: *default
+  database: <%= ENV.fetch("TEST_DATABASE_NAME", "coffee_shop_test") %>
+
+production:
+  <<: *default
+  database: <%= ENV.fetch("DATABASE_NAME", "coffee_shop_production") %>
