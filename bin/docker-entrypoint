@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+# Only the web process prepares the schema; the worker just waits for it.
+if [ "${1}" = "bundle" ] && [ "${3}" = "puma" ]; then
+  bundle exec rails db:prepare
+fi
+
+exec "${@}"
