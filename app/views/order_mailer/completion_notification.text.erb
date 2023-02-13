@@ -1,0 +1,8 @@
+Thank you for placing an order with us, <%= @customer.name %>!
+
+Your order has been completed. These are your ordered items:
+<% @order_items.each do |order_item| -%>
+  - <%= order_item.quantity %> x <%= order_item.item.name %>
+<% end -%>
+
+Your total amount is: <%= format('%.2f', @total_amount.to_f) %>.

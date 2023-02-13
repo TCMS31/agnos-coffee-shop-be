@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Thank you for placing an order with us, <%= @customer.name.titleize %></h1>
+
+    <p>Your order has been completed. These are your ordered items:</p>
+
+    <ul>
+      <% @order_items.each do |order_item| %>
+        <li><%= order_item.quantity %> &times; <%= order_item.item.name %></li>
+      <% end %>
+    </ul>
+
+    <p>Your total amount is: <%= format('%.2f', @total_amount.to_f) %>.</p>
+  </body>
+</html>
