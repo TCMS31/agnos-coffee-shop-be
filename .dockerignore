@@ -1,0 +1,31 @@
+.git
+.github
+.gitignore
+.rubocop.yml
+.rspec
+
+# Never bake credentials or a developer's local environment into an image.
+.env
+.env.*
+!.env.example
+config/master.key
+
+# Host-side bundle; the image installs its own into /usr/local/bundle.
+.bundle
+vendor/bundle
+
+# Test and development-only material.
+spec
+docs
+coverage
+log
+tmp
+storage
+*.md
+!README.md
+
+# Editor and OS cruft.
+.DS_Store
+.idea
+.vscode
+dump.rdb

@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: coffee_shop
+      POSTGRES_PASSWORD: coffee_shop
+      POSTGRES_DB: coffee_shop_production
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coffee_shop"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    # Host port 8530 -> container 3000. The frontend expects the API on
+    # http://localhost:3001, so set its base URL to match whichever you publish.
+    ports:
+      - "8530:3000"
+    environment: &app_env
+      RAILS_ENV: production
+      RAILS_LOG_TO_STDOUT: "1"
+      RAILS_MAX_THREADS: "5"
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      DATABASE_USERNAME: coffee_shop
+      DATABASE_PASSWORD: coffee_shop
+      DATABASE_NAME: coffee_shop_production
+      REDIS_URL: redis://redis:6379/0
+      EMAIL_DEFAULT_ADDRESS: ${EMAIL_DEFAULT_ADDRESS:-orders@coffee-shop.example}
+      # Supply a real value: `SECRET_KEY_BASE=$(openssl rand -hex 64) docker compose up`
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?set SECRET_KEY_BASE before starting}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: ["bundle", "exec", "sidekiq"]
+    environment: *app_env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  redisdata:
